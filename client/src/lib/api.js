@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:8000'
+const apiUrl = '/api'
 
 export const getTrade = id => fetch(`${apiUrl}/trade/${id}`).then(res => res.json())
 

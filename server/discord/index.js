@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 
 const commands = ['!trade', '!help']
 
-const tradeUrl = 'http://localhost:3000/trade/'
+const tradeUrl = 'http://nftninja.io/trade/'
 const niftyNinjaChannelId = '543231000252252201'
 
 class DiscordBot {

@@ -10,7 +10,7 @@ const express = require('express'),
   DiscordBot = require('./discord'),
   {success, failure} = require('./lib/httplib');
 
-
+const path = require('path')
 /* setup */
 const trades = fs.existsSync('./kitties.json') ? JSON.parse(fs.readFileSync('./kitties.json')) : {}
 
@@ -19,8 +19,8 @@ const createTrade = async (haveToken, wantToken) => {
   const haveCat = await getKittyCat(haveToken)
   const wantCat = await getKittyCat(wantToken)
   trades[id] = { have: haveCat, want: wantCat }
-  // console.log(trades[id])
-  // console.log('created pre-trade ', id)
+  console.log(trades[id])
+  console.log('created pre-trade ', id)
   fs.writeFileSync('./kitties.json', JSON.stringify(trades))
   return id;
 }
@@ -39,10 +39,10 @@ const app = express();
 
 app.use(cors({ allowedHeaders: 'Content-Type, Cache-Control' }));
 app.options('*', cors());
-// app.use( bodyParser.urlencoded({ extended: false }) )
+app.use( bodyParser.urlencoded({ extended: false }) )
 app.use(bodyParser.json({ verify: rawBodyHandler }));
 /*
-app.post('/trade/pre', async (req, res) => {
+app.post('/api/trade/pre', async (req, res) => {
   try {
     const { have, want } = req.body;
     const id = shortid.generate();
@@ -58,7 +58,7 @@ app.post('/trade/pre', async (req, res) => {
   }
 });
 */
-app.get('/trade/:id', (req, res) => {
+app.get('/api/trade/:id', (req, res) => {
   try {
     const trade = trades[req.params.id]
     if (!trade) throw new Error("trade id does not exist")
@@ -69,7 +69,7 @@ app.get('/trade/:id', (req, res) => {
   }
 })
 
-app.post('/trade/setorder', (req, res) => {
+app.post('/api/trade/setorder', (req, res) => {
   try {
     const { order, id } = req.body;
     const trade = trades[id]
@@ -85,7 +85,7 @@ app.post('/trade/setorder', (req, res) => {
   }
 })
 
-app.post('/trade/fillorder', (req, res) => {
+app.post('/api/trade/fillorder', (req, res) => {
   try {
     const { txReceipt, id } = req.body;
     const trade = trades[id]
@@ -95,11 +95,17 @@ app.post('/trade/fillorder', (req, res) => {
       trades[id] = { ...trade, txReceipt }
     }
     fs.writeFileSync('./kitties.json', JSON.stringify(trades))
+    res.send(success('great job!'))
   } catch ({message}) {
     res.send(failure({ message }))
   }
 })
 
-app.listen(8000, () => {
-  console.log('Example app listening on port 8000!')
+app.use(express.static(path.join(__dirname, '../client/build')))
+
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
+
+app.listen(80, () => {
+  console.log('Example app listening on port 80!')
 });

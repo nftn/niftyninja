@@ -80,11 +80,11 @@ class Trade extends Component {
   handleUnlockSubmit = async () => {
     console.log('unlocked')
     const { order, have, want, tradeId, isMaker, canTrade } = this.state
-    const haveTokenId = have.id;
-    const approveTxHash = await approveAsync(haveTokenId);
+    const tokenId = isMaker ? have.id : want.id;
+    const approveTxHash = await approveAsync(tokenId);
     this.setState({ modalWaiting: true})
     await awaitTransactionMined(approveTxHash);
-    this.setState({ modalWaiting: false, modalStage: 'confirm'})
+    this.setState({ modalWaiting: false, modalStage: isMaker ? 'confirm' : 'fill'})
   }
 
   handleConfirmSubmit = async () => {
@@ -140,8 +140,9 @@ class Trade extends Component {
       alert('sorry, you do not own either token in this trade')
       return;
     }
-    if (isMaker) this.setState({ showModal: true, modalStage: 'unlock'})
-    else this.setState({ showModal: true, modalStage: 'fill'})
+    /*if (isMaker)*/
+     this.setState({ showModal: true, modalStage: 'unlock'})
+    //else this.setState({ showModal: true, modalStage: 'fill'})
     /*
     if (isMaker) {
       const haveTokenId = have.id;

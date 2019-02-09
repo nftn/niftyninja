@@ -19,7 +19,7 @@ import { getAccount, getWeb3Wrapper, getProviderEngine } from './provider_engine
 export const generatePRSalt = () => generatePseudoRandomSalt();
 
 const getRandomFutureDateInSeconds = () => {
-  return new BigNumber(Date.now() + TEN_MINUTES_MS * 6).div(ONE_SECOND_MS).integerValue()
+  return new BigNumber(Date.now() + TEN_MINUTES_MS * 200).div(ONE_SECOND_MS).integerValue()
 };
 
 /*
@@ -103,7 +103,7 @@ export const fillOrder = async (signedOrder) => {
   signedOrder.takerFee = ZERO;
   signedOrder.salt = new BigNumber(signedOrder.salt)
   console.log(signedOrder)
-  const txHash = await contractWrappers.exchange.fillOrderAsync(signedOrder, takerAssetAmount, taker, { gasLimit: 150000 });
+  const txHash = await contractWrappers.exchange.fillOrderAsync(signedOrder, takerAssetAmount, taker/*, { gasLimit: 300000 }*/);
   return txHash;
 }
 
