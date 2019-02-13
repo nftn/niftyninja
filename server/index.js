@@ -9,19 +9,7 @@ const express = require('express'),
   zero = require('./lib/zero'),
   DiscordBot = require('./discord'),
   {success, failure} = require('./lib/httplib'),
-  { kittyInfo, getKitties } = require('./lib/cryptoKittyApi'),
-  https = require('https');
-
-const http = require('http')
-http.createServer(function (req, res) {
-    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-    res.end();
-}).listen(80);
-
-const privateKey = fs.readFileSync('./privkey.pem', 'utf8')
-const certificate = fs.readFileSync('./cert.pem', 'utf8')
-
-const credentials = {key: privateKey, cert: certificate}
+  { kittyInfo, getKitties } = require('./lib/cryptoKittyApi');
 
 const path = require('path')
 /* setup */
@@ -32,8 +20,6 @@ const createTrade = async (haveToken, wantToken) => {
   const haveCat = await kittyInfo(haveToken)
   const wantCat = await kittyInfo(wantToken)
   trades.push({ have: haveCat, want: wantCat })
-  // console.log(trades[id])
-  // console.log('created pre-trade ', id)
   fs.writeFileSync('./kitties.json', JSON.stringify(trades))
   return id;
 }
@@ -45,7 +31,7 @@ const getTrade = id => trades[id-1000]
 const updateTrade = (id, value) => trades[id-1000] = value
 
 const discord = new DiscordBot(createTrade)
-discord.login();
+if (prod) discord.login();
 
 var rawBodyHandler = function (req, res, buf, encoding) {
   if (buf && buf.length) {
@@ -56,30 +42,11 @@ var rawBodyHandler = function (req, res, buf, encoding) {
 
 const app = express();
 
-//app.use(express.static(path.join(__dirname, '../client/build')))
-//app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
-
 app.use(cors({ allowedHeaders: 'Content-Type, Cache-Control' }));
 app.options('*', cors());
-// app.use( bodyParser.urlencoded({ extended: false }) )
+
 app.use(bodyParser.json({ verify: rawBodyHandler }));
-/*
-app.post('/trade/pre', async (req, res) => {
-  try {
-    const { have, want } = req.body;
-    const id = shortid.generate();
-    const haveCat = await getKittyCat(have)
-    const wantCat = await getKittyCat(want)
-    trades[id] = { have: haveCat, want: wantCat }
-    console.log(trades[id])
-    console.log('created pre-trade ', id)
-    res.send(success({ id }))
-    fs.writeFileSync('./kitties.json', JSON.stringify(trades))
-  } catch ({message}) {
-    res.send(failure({ message }))
-  }
-});
-*/
+
 app.get('/api/trade/:id', (req, res) => {
   try {
     const trade = getTrade(req.params.id)
@@ -125,7 +92,7 @@ app.post('/api/trade/setorder', (req, res) => {
       console.log('trade put request ', id, trade)
       if (!trade.order) updateTrade(id, { ...trade, order })
     }
-    discord.announceOpenOrder(id, trade.have.id, trade.want.id)
+    if (prod) discord.announceOpenOrder(id, trade.have.id, trade.want.id)
     fs.writeFileSync('./kitties.json', JSON.stringify(trades))
     res.send(success())
   } catch ({message}) {
@@ -149,15 +116,21 @@ app.post('/api/trade/fillorder', (req, res) => {
   }
 })
 
-app.use(express.static(path.join(__dirname, '../client/build')))
+const port = prod ? 443 : 8000 
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
+if (prod) {
+  app.use(express.static(path.join(__dirname, '../client/build')))
+  app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
+  app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../client/build/index.html')))
+  const server = https.createServer(credentials, app)
+  server.listen(port, () => {
+    console.log(`Example app listening on port ${port}!`)
+  });
+} else {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}!`)
+  });
+}
 
-const port = prod ? 443 : 8000 // 80
 
-const server = https.createServer(credentials, app)
 
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`)
-});
