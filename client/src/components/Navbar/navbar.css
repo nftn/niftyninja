@@ -1,0 +1,80 @@
+.navbar { 
+  width: 90%;
+  max-width: 90%;
+  height: 80px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 5%;
+  padding-right: 5%;
+  justify-content: space-between;
+  border-bottom: 2px solid #efefef;
+}
+
+.brand {
+  width: 116px;
+  height: 40px;
+  margin-top: 10px;
+  object-fit: contain;
+}
+
+.Fill-1 {
+  width: 15.1px;
+  height: 16.5px;
+  background-color: #70a5ff;
+}
+
+.Fill-6 {
+  width: 11.5px;
+  height: 21.1px;
+  background-color: #424242;
+}
+
+.Fill-8 {
+  width: 8.4px;
+  height: 15.5px;
+  background-color: #424242;
+}
+
+.Fill-10 {
+  width: 15px;
+  height: 19.6px;
+  background-color: #424242;
+}
+
+.Fill-14 {
+  width: 7.3px;
+  height: 18.4px;
+  background-color: #424242;
+}
+
+.Fill-16 {
+  width: 14.4px;
+  height: 12.7px;
+  background-color: #424242;
+}
+
+.Clip-21 {
+  width: 15.6px;
+  height: 12.9px;
+}
+
+.Trade {
+  width: 51px;
+  height: 22px;
+  font-family: OpenSans;
+  font-size: 16px;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #757575;
+}
+
+.Rectangle-Copy {
+  width: 225px;
+  height: 2px;
+  background-color: #efefef;
+}
