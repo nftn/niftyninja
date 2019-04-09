@@ -1,7 +1,7 @@
 'use strict';
 const { XMLHttpRequest } = require('xmlhttprequest');
 
-const INFURA_TOKEN = '5b75e3d06e0b4d0abc77689e2507d72b';
+const INFURA_TOKEN = '-';
 
 // web3-utils#soliditySha3('getKitty(uint256)') first 4 bytes (8 hex chars)
 const GET_KITTY_SIGNATURE = 'e98b7f4d';
